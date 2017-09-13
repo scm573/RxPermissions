@@ -16,9 +16,11 @@ package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -58,6 +60,33 @@ public class RxPermissions {
 
     private RxPermissionsFragment findRxPermissionsFragment(Activity activity) {
         return (RxPermissionsFragment) activity.getFragmentManager().findFragmentByTag(TAG);
+    }
+
+    // Ref: https://github.com/tbruyelle/RxPermissions/issues/155
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public RxPermissions(@NonNull Fragment fragment) {
+        mRxPermissionsFragment = getRxPermissionsFragment(fragment);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private RxPermissionsFragment getRxPermissionsFragment(Fragment fragment) {
+        RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(fragment);
+        boolean isNewInstance = rxPermissionsFragment == null;
+        if (isNewInstance) {
+            rxPermissionsFragment = new RxPermissionsFragment();
+            FragmentManager fragmentManager = fragment.getChildFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .add(rxPermissionsFragment, TAG)
+                    .commitAllowingStateLoss();
+            fragmentManager.executePendingTransactions();
+        }
+        return rxPermissionsFragment;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private RxPermissionsFragment findRxPermissionsFragment(Fragment fragment) {
+        return (RxPermissionsFragment) fragment.getChildFragmentManager().findFragmentByTag(TAG);
     }
 
     public void setLogging(boolean logging) {
