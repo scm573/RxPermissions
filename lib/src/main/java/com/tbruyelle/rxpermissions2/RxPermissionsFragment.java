@@ -26,7 +26,7 @@ public class RxPermissionsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        // setRetainInstance(true); // Comment out this line as a workaround since "Can't retain fragements that are nested in other fragments"
     }
 
     @TargetApi(Build.VERSION_CODES.M)
